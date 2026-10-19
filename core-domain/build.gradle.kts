@@ -1,5 +1,10 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
+    application
+}
+
+application {
+    mainClass.set("com.readingassistant.domain.simulator.ConsoleSimulatorKt")
 }
 
 java {
