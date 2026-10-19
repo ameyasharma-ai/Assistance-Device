@@ -27,7 +27,7 @@ class AssistantStateMachine(
     private val _state = MutableStateFlow(initialState)
     val state: StateFlow<AssistantState> = _state.asStateFlow()
 
-    private val _actions = MutableSharedFlow<AssistantAction>(extraBufferCapacity = 64)
+    private val _actions = MutableSharedFlow<AssistantAction>(replay = 1, extraBufferCapacity = 64)
     val actions: SharedFlow<AssistantAction> = _actions.asSharedFlow()
 
     /**

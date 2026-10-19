@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.asSharedFlow
  */
 class SimulatedInputSource : InputController {
 
-    private val _rawEvents = MutableSharedFlow<ButtonEvent>(extraBufferCapacity = 64)
+    private val _rawEvents = MutableSharedFlow<ButtonEvent>(replay = 1, extraBufferCapacity = 64)
     override val rawEvents: SharedFlow<ButtonEvent> = _rawEvents.asSharedFlow()
 
     override suspend fun emitEvent(event: ButtonEvent) {
