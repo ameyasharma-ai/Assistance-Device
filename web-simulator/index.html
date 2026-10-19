@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wearable AI Reading Assistant — Visual Developer Console</title>
+  <meta name="description" content="Interactive developer visual console and hardware simulator for the Wearable AI Reading Assistant for blind and visually impaired users.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <!-- Header Bar with State Flow -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
+          <path d="M2 12h20"/>
+        </svg>
+      </div>
+      <div>
+        <h1 class="brand-title">Wearable AI Reading Assistant</h1>
+        <p class="brand-sub">Hardware &amp; Auditory Developer Simulation Console</p>
+      </div>
+    </div>
+
+    <!-- Active State Pill -->
+    <div class="state-container">
+      <span class="state-label">SYSTEM STATE</span>
+      <div id="activeStateBadge" class="state-badge state-idle">
+        <span class="pulsing-dot"></span>
+        <span id="activeStateText">IDLE</span>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="header-actions">
+      <button id="btnAutoDemo" class="btn btn-primary">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+          <polygon points="5 3 19 12 5 21 5 3"/>
+        </svg>
+        Run Auto Demo Walkthrough
+      </button>
+      <button id="btnReset" class="btn btn-ghost" title="Reset system to IDLE">Reset</button>
+    </div>
+  </header>
+
+  <!-- Interactive State Flow Pipeline Ribbon -->
+  <nav class="pipeline-ribbon" aria-label="State Machine Progress">
+    <div class="pipeline-step" data-state="IDLE"><span>1. IDLE</span></div>
+    <div class="pipeline-arrow">&rarr;</div>
+    <div class="pipeline-step" data-state="SCANNING"><span>2. SCANNING</span></div>
+    <div class="pipeline-arrow">&rarr;</div>
+    <div class="pipeline-step" data-state="DOCUMENT_READY"><span>3. DOC READY</span></div>
+    <div class="pipeline-arrow">&rarr;</div>
+    <div class="pipeline-step" data-state="CAPTURING"><span>4. CAPTURE</span></div>
+    <div class="pipeline-arrow">&rarr;</div>
+    <div class="pipeline-step" data-state="PROCESSING"><span>5. AI REASONING</span></div>
+    <div class="pipeline-arrow">&rarr;</div>
+    <div class="pipeline-step" data-state="PLAYING"><span>6. AUDITORY STUDY</span></div>
+  </nav>
+
+  <!-- Main 3-Column Studio Grid -->
+  <main class="studio-grid">
+
+    <!-- COLUMN 1: Hardware & Foot Pedals -->
+    <section class="panel panel-hardware" aria-labelledby="hardware-title">
+      <div class="panel-header">
+        <h2 id="hardware-title" class="panel-title">Shoe-Mounted Foot Pedals</h2>
+        <span class="badge-pill">BLE Microswitches</span>
+      </div>
+      <p class="panel-desc">Physical switches mounted on shoes allowing blind hands-free navigation.</p>
+
+      <!-- Pedals Container -->
+      <div class="pedals-wrapper">
+
+        <!-- Left Shoe -->
+        <div class="shoe-card left-shoe">
+          <div class="shoe-header">
+            <span class="shoe-tag">LEFT SHOE</span>
+            <span class="key-hint">[Key: L]</span>
+          </div>
+
+          <div class="foot-silhouette" id="leftShoeVisual">
+            <div class="sole-outline">
+              <div class="switch-hotspot heel" id="leftHeelSwitch">
+                <span class="hotspot-label">Pedal Switch</span>
+                <div class="haptic-rings" id="leftHapticRing"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="shoe-controls">
+            <button id="btnLeftTap" class="btn-pedal btn-pedal-primary">
+              <strong>Tap</strong>
+              <span>Scan / Cancel / Prev</span>
+            </button>
+            <button id="btnLeftDouble" class="btn-pedal btn-pedal-sub">
+              <strong>Double Tap</strong>
+              <span>Rewind 15s</span>
+            </button>
+            <button id="btnLeftLong" class="btn-pedal btn-pedal-sub">
+              <strong>Long Press</strong>
+              <span>Previous Section</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Right Shoe -->
+        <div class="shoe-card right-shoe">
+          <div class="shoe-header">
+            <span class="shoe-tag right-tag">RIGHT SHOE</span>
+            <span class="key-hint">[Key: R / Space]</span>
+          </div>
+
+          <div class="foot-silhouette" id="rightShoeVisual">
+            <div class="sole-outline">
+              <div class="switch-hotspot heel" id="rightHeelSwitch">
+                <span class="hotspot-label">Pedal Switch</span>
+                <div class="haptic-rings" id="rightHapticRing"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="shoe-controls">
+            <button id="btnRightTap" class="btn-pedal btn-pedal-emerald">
+              <strong>Tap</strong>
+              <span>Capture / Confirm / Play</span>
+            </button>
+            <button id="btnRightDouble" class="btn-pedal btn-pedal-sub">
+              <strong>Double Tap</strong>
+              <span>Repeat Paragraph</span>
+            </button>
+            <button id="btnRightLong" class="btn-pedal btn-pedal-sub">
+              <strong>Long Press</strong>
+              <span>Next Section</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Feedback Actuators Monitor -->
+      <div class="actuator-monitor">
+        <h3 class="monitor-title">Tactile &amp; Auditory Actuators</h3>
+
+        <div class="actuator-row">
+          <span class="actuator-name">Haptic Waveform:</span>
+          <span id="txtHapticEvent" class="actuator-val text-cyan">IDLE (0ms)</span>
+        </div>
+
+        <div class="actuator-row">
+          <span class="actuator-name">Earphone Voice Cue:</span>
+          <span id="txtSpokenCue" class="actuator-val text-emerald">"System standby."</span>
+        </div>
+
+        <!-- Audio Spectrum Bars -->
+        <div class="audio-spectrum" id="audioSpectrum" aria-label="Speech Audio Activity">
+          <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+          <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+          <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+          <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- COLUMN 2: Camera Viewport & Quality Engine -->
+    <section class="panel panel-vision" aria-labelledby="vision-title">
+      <div class="panel-header">
+        <h2 id="vision-title" class="panel-title">Chest-Mounted Camera &amp; Vision Engine</h2>
+        <span id="camStatusBadge" class="badge-pill badge-green">UVC READY</span>
+      </div>
+      <p class="panel-desc">Real-time image quality analysis ensuring 100% textbook readability before AI processing.</p>
+
+      <!-- Viewport Display -->
+      <div class="camera-viewport-container">
+        <div class="camera-viewport" id="camViewport">
+          <img id="camImage" src="assets/textbook.jpg" alt="Textbook Chapter 3 on Laws of Motion" class="camera-frame">
+          <div class="scanline-overlay"></div>
+          <div class="glare-hotspot" id="glareOverlay"></div>
+
+          <!-- Document Framing Bounding Box -->
+          <div class="framing-box" id="framingBox">
+            <span class="corner top-left"></span>
+            <span class="corner top-right"></span>
+            <span class="corner bottom-left"></span>
+            <span class="corner bottom-right"></span>
+            <div class="framing-tag" id="framingTag">PAGE FRAMED &amp; ALIGNED</div>
+          </div>
+        </div>
+
+        <!-- Scenario Selector Buttons -->
+        <div class="scenario-bar">
+          <span class="scenario-label">Inject Scenario:</span>
+          <div class="scenario-buttons">
+            <button class="btn-scenario active" data-scenario="SHARP">1. Sharp</button>
+            <button class="btn-scenario" data-scenario="BLURRY">2. Blurry</button>
+            <button class="btn-scenario" data-scenario="CROPPED">3. Cropped</button>
+            <button class="btn-scenario" data-scenario="DARK">4. Dark</button>
+            <button class="btn-scenario" data-scenario="GLARE">5. Glare</button>
+            <button class="btn-scenario" data-scenario="OFFLINE">6. Offline</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Real-Time Image Quality Metrics -->
+      <div class="quality-dashboard">
+        <h3 class="monitor-title">ImageQualityEngine Metrics</h3>
+
+        <div class="metrics-grid">
+          <!-- Metric: Sharpness -->
+          <div class="metric-card">
+            <div class="metric-top">
+              <span class="metric-label">Text Sharpness</span>
+              <span id="valSharpness" class="metric-num">92%</span>
+            </div>
+            <div class="progress-track"><div id="barSharpness" class="progress-fill fill-cyan" style="width: 92%;"></div></div>
+            <span class="metric-sub">Laplacian Variance: 284.5</span>
+          </div>
+
+          <!-- Metric: Glare -->
+          <div class="metric-card">
+            <div class="metric-top">
+              <span class="metric-label">Specular Glare</span>
+              <span id="valGlare" class="metric-num">0.4%</span>
+            </div>
+            <div class="progress-track"><div id="barGlare" class="progress-fill fill-emerald" style="width: 2%;"></div></div>
+            <span class="metric-sub">Threshold &lt; 2.0%</span>
+          </div>
+
+          <!-- Metric: Exposure -->
+          <div class="metric-card">
+            <div class="metric-top">
+              <span class="metric-label">Illumination</span>
+              <span id="valExposure" class="metric-num">78%</span>
+            </div>
+            <div class="progress-track"><div id="barExposure" class="progress-fill fill-cyan" style="width: 78%;"></div></div>
+            <span class="metric-sub">Mean Pixel: 198 / 255</span>
+          </div>
+
+          <!-- Metric: Framing Margin -->
+          <div class="metric-card">
+            <div class="metric-top">
+              <span class="metric-label">Margin Bounds</span>
+              <span id="valFraming" class="metric-num">Optimal</span>
+            </div>
+            <div class="progress-track"><div id="barFraming" class="progress-fill fill-emerald" style="width: 95%;"></div></div>
+            <span class="metric-sub">All 4 Edges Clear</span>
+          </div>
+        </div>
+
+        <!-- Quality Decision Alert -->
+        <div id="qualityDecisionBanner" class="quality-banner banner-ready">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+          <span id="txtQualityDecision">DOCUMENT READY: Quality verified. Tap Right Foot to capture still.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- COLUMN 3: AI Document Generation & Auditory Playback -->
+    <section class="panel panel-document" aria-labelledby="document-title">
+      <div class="panel-header">
+        <h2 id="document-title" class="panel-title">Auditory Study Document</h2>
+        <span id="playbackStatusBadge" class="badge-pill badge-cyan">STOPPED</span>
+      </div>
+      <p class="panel-desc">Strictly segregates verbatim source transcription from explanations and solutions.</p>
+
+      <!-- Active Speech Card -->
+      <div class="active-speech-card">
+        <div class="speech-top">
+          <span class="speech-tag">CURRENTLY READING ALOUD</span>
+          <span id="txtSpeechPosition" class="speech-pos">Section 1 • Segment 1</span>
+        </div>
+        <p id="txtActiveSpeechUtterance" class="speech-utterance">
+          "Tap Right Foot to commence auditory study."
+        </p>
+        <div class="speech-progress">
+          <div id="barSpeechProgress" class="speech-progress-fill" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <!-- Playback Controls Bar -->
+      <div class="playback-controls">
+        <button id="btnPrevSentence" class="ctrl-btn" title="Previous Sentence (Left Tap)">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5" stroke="currentColor" stroke-width="2"/></svg>
+        </button>
+        <button id="btnPlayPause" class="ctrl-btn ctrl-btn-main" title="Play / Pause (Right Tap)">
+          <svg id="iconPlay" viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <svg id="iconPause" class="hidden" viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+        </button>
+        <button id="btnNextSentence" class="ctrl-btn" title="Next Sentence">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"/></svg>
+        </button>
+        <button id="btnRepeat" class="ctrl-btn" title="Repeat Paragraph (Right Double Tap)">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+        </button>
+        <div class="speed-toggle">
+          <span class="speed-label">Rate:</span>
+          <button id="btnSpeed" class="btn-speed">1.0x</button>
+        </div>
+      </div>
+
+      <!-- Structured Document Container -->
+      <div class="document-content-scroll" id="docContentScroll">
+
+        <!-- Section 1: Verbatim Source -->
+        <article class="doc-section section-transcription">
+          <header class="section-badge-header">
+            <span class="section-pill pill-cyan">【VERBATIM SOURCE TRANSCRIPTION】</span>
+            <span class="section-title">Chapter 3: Laws of Motion</span>
+          </header>
+          <div class="section-body">
+            <p class="speakable-sentence" data-sec="0" data-seg="0">
+              3.2 Newton's Second Law: Acceleration and Force.
+            </p>
+            <p class="speakable-sentence" data-sec="0" data-seg="1">
+              Newton's Second Law describes the quantitative relationship among force, mass, and acceleration.
+            </p>
+            <p class="speakable-sentence" data-sec="0" data-seg="2">
+              It states that the acceleration (a) of an object is directly proportional to the net force acting upon it and inversely proportional to its mass.
+            </p>
+            <p class="speakable-sentence" data-sec="0" data-seg="3">
+              Formula: F = m · a, where F is the vector sum of forces in Newtons, m is the mass in kilograms, and a is acceleration in meters per second squared.
+            </p>
+          </div>
+        </article>
+
+        <!-- Section 2: Key Definitions -->
+        <article class="doc-section section-definitions">
+          <header class="section-badge-header">
+            <span class="section-pill pill-emerald">【KEY DEFINITIONS &amp; LAWS】</span>
+            <span class="section-title">Core Principles</span>
+          </header>
+          <div class="section-body">
+            <p class="speakable-sentence" data-sec="1" data-seg="0">
+              <strong>Newton's Second Law:</strong> Net Force equals Mass multiplied by Acceleration (F = m · a).
+            </p>
+            <p class="speakable-sentence" data-sec="1" data-seg="1">
+              <strong>Newton's Third Law:</strong> For every action in nature, there is an equal and opposite reaction force.
+            </p>
+            <p class="speakable-sentence" data-sec="1" data-seg="2">
+              <strong>Action-Reaction Pairs:</strong> Two forces of equal magnitude acting on separate interacting bodies in opposite directions.
+            </p>
+          </div>
+        </article>
+
+        <!-- Section 3: Concept Explanations -->
+        <article class="doc-section section-explanation">
+          <header class="section-badge-header">
+            <span class="section-pill pill-amber">【CONCEPT EXPLANATIONS】</span>
+            <span class="section-title">Physical Intuition</span>
+          </header>
+          <div class="section-body">
+            <p class="speakable-sentence" data-sec="2" data-seg="0">
+              Think of pushing a heavy 25 kg box across a floor.
+            </p>
+            <p class="speakable-sentence" data-sec="2" data-seg="1">
+              As your hands exert an action force pushing forward on the box, the box simultaneously exerts an identical reaction force backwards against your palms.
+            </p>
+            <p class="speakable-sentence" data-sec="2" data-seg="2">
+              These forces never cancel out because they act on two completely different objects: one on the box, and one on your hands.
+            </p>
+          </div>
+        </article>
+
+        <!-- Section 4: Worked Solutions -->
+        <article class="doc-section section-solutions">
+          <header class="section-badge-header">
+            <span class="section-pill pill-rose">【WORKED SOLUTIONS】</span>
+            <span class="section-title">Example 3.1 Step-by-Step</span>
+          </header>
+          <div class="section-body">
+            <p class="speakable-sentence" data-sec="3" data-seg="0">
+              <strong>Problem:</strong> A 15 kg object is subjected to a net force of 45 Newtons. Calculate its acceleration.
+            </p>
+            <p class="speakable-sentence" data-sec="3" data-seg="1">
+              <strong>Step 1:</strong> Identify known quantities. Mass m equals 15 kilograms. Force F equals 45 Newtons.
+            </p>
+            <p class="speakable-sentence" data-sec="3" data-seg="2">
+              <strong>Step 2:</strong> Rearrange Newton's Second Law: Acceleration a equals Force divided by Mass.
+            </p>
+            <p class="speakable-sentence" data-sec="3" data-seg="3">
+              <strong>Step 3:</strong> Calculate: 45 Newtons divided by 15 kilograms equals 3.0 meters per second squared.
+            </p>
+          </div>
+        </article>
+
+        <!-- Section 5: Summary -->
+        <article class="doc-section section-summary">
+          <header class="section-badge-header">
+            <span class="section-pill pill-violet">【STUDY SUMMARY】</span>
+            <span class="section-title">Key Takeaways</span>
+          </header>
+          <div class="section-body">
+            <p class="speakable-sentence" data-sec="4" data-seg="0">
+              Higher force creates greater acceleration; higher mass dampens acceleration.
+            </p>
+            <p class="speakable-sentence" data-sec="4" data-seg="1">
+              Action and reaction forces occur simultaneously and always in pairs.
+            </p>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
