@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -15,6 +17,12 @@ android {
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val geminiApiKey = readEnvProperty("GEMINI_API_KEY", "")
+        val geminiModel = readEnvProperty("GEMINI_MODEL", "gemini-flash-lite-latest")
+
+        buildConfigField("String", "GEMINI_API_KEY", "\"$geminiApiKey\"")
+        buildConfigField("String", "GEMINI_MODEL", "\"$geminiModel\"")
     }
 
     buildTypes {
@@ -35,10 +43,40 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
     testOptions {
         unitTests.isReturnDefaultValues = true
     }
+}
+
+fun readEnvProperty(key: String, defaultValue: String = ""): String {
+    val sysEnv = System.getenv(key)
+    if (!sysEnv.isNullOrBlank()) return sysEnv
+
+    val envFile = rootProject.file(".env")
+    if (envFile.exists()) {
+        for (line in envFile.readLines()) {
+            val trimmed = line.trim()
+            if (!trimmed.startsWith("#") && trimmed.contains("=")) {
+                val parts = trimmed.split("=", limit = 2)
+                if (parts[0].trim() == key) {
+                    val value = parts[1].trim().removeSurrounding("\"").removeSurrounding("'")
+                    if (value.isNotBlank()) return value
+                }
+            }
+        }
+    }
+
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        val properties = Properties()
+        localPropertiesFile.inputStream().use { properties.load(it) }
+        val prop = properties.getProperty(key)
+        if (!prop.isNullOrBlank()) return prop
+    }
+
+    return defaultValue
 }
 
 dependencies {

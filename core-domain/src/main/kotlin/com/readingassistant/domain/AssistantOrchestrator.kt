@@ -67,6 +67,12 @@ class AssistantOrchestrator(
         cameraController.analysisFrames.onEach { frame ->
             processFrame(frame)
         }.launchIn(orchestratorScope)
+
+        playbackController.playbackStatus.onEach { status ->
+            if (status == com.readingassistant.domain.model.PlaybackStatus.STOPPED && stateMachine.state.value is AssistantState.Playing) {
+                stateMachine.dispatch(AssistantEvent.PlaybackCompleted)
+            }
+        }.launchIn(orchestratorScope)
     }
 
     suspend fun processFrame(frame: com.readingassistant.domain.camera.AnalysisFrame) {

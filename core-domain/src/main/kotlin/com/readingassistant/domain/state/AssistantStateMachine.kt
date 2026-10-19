@@ -261,6 +261,7 @@ class AssistantStateMachine(
                 transitionTo(AssistantState.ScannerStarting(sessionId))
                 emit(AssistantAction.StartCamera(sessionId))
                 emit(AssistantAction.EmitHaptic(TactilePattern.SCANNER_ACTIVATED))
+                emit(AssistantAction.SpeakPrompt(SpokenPrompt("scan_next", "Scanner activated. Align next page in frame.")))
             }
             else -> { /* Ignore */ }
         }
@@ -325,12 +326,16 @@ class AssistantStateMachine(
             }
             is AssistantEvent.PlaybackCompleted -> {
                 transitionTo(AssistantState.DocumentReadyForPlayback(current.document))
+                emit(AssistantAction.EmitHaptic(TactilePattern.PROCESSING_COMPLETED))
+                emit(AssistantAction.SpeakPrompt(SpokenPrompt("playback_done", "Section complete. Tap Left Foot to scan next page, or Right Foot to listen again.")))
             }
             is AssistantEvent.StartScanRequested -> {
                 emit(AssistantAction.PausePlayback)
                 val sessionId = sessionIdGenerator()
                 transitionTo(AssistantState.ScannerStarting(sessionId))
                 emit(AssistantAction.StartCamera(sessionId))
+                emit(AssistantAction.EmitHaptic(TactilePattern.SCANNER_ACTIVATED))
+                emit(AssistantAction.SpeakPrompt(SpokenPrompt("scan_next", "Scanner activated. Align next page in frame.")))
             }
             else -> { /* Ignore */ }
         }
@@ -384,6 +389,8 @@ class AssistantStateMachine(
                 val sessionId = sessionIdGenerator()
                 transitionTo(AssistantState.ScannerStarting(sessionId))
                 emit(AssistantAction.StartCamera(sessionId))
+                emit(AssistantAction.EmitHaptic(TactilePattern.SCANNER_ACTIVATED))
+                emit(AssistantAction.SpeakPrompt(SpokenPrompt("scan_next", "Scanner activated. Align next page in frame.")))
             }
             else -> { /* Ignore */ }
         }

@@ -93,9 +93,22 @@ class InputPolicy(
                 }
             }
 
-            is AssistantState.DocumentReadyForPlayback,
-            is AssistantState.Playing,
-            is AssistantState.Paused -> {
+            is AssistantState.DocumentReadyForPlayback -> {
+                when (event.button) {
+                    PhysicalButton.RIGHT -> when (event.type) {
+                        PressType.SHORT_PRESS -> ButtonCommand.TogglePlayPause
+                        PressType.DOUBLE_PRESS -> ButtonCommand.NextParagraph
+                        PressType.LONG_PRESS -> ButtonCommand.NextSection
+                    }
+                    PhysicalButton.LEFT -> when (event.type) {
+                        PressType.SHORT_PRESS -> ButtonCommand.StartScan
+                        PressType.DOUBLE_PRESS -> ButtonCommand.Rewind(15)
+                        PressType.LONG_PRESS -> ButtonCommand.StartScan
+                    }
+                }
+            }
+
+            is AssistantState.Playing -> {
                 when (event.button) {
                     PhysicalButton.RIGHT -> when (event.type) {
                         PressType.SHORT_PRESS -> ButtonCommand.TogglePlayPause
@@ -105,7 +118,22 @@ class InputPolicy(
                     PhysicalButton.LEFT -> when (event.type) {
                         PressType.SHORT_PRESS -> ButtonCommand.PreviousParagraph
                         PressType.DOUBLE_PRESS -> ButtonCommand.Rewind(15)
-                        PressType.LONG_PRESS -> ButtonCommand.PreviousSection
+                        PressType.LONG_PRESS -> ButtonCommand.StartScan
+                    }
+                }
+            }
+
+            is AssistantState.Paused -> {
+                when (event.button) {
+                    PhysicalButton.RIGHT -> when (event.type) {
+                        PressType.SHORT_PRESS -> ButtonCommand.TogglePlayPause
+                        PressType.DOUBLE_PRESS -> ButtonCommand.NextParagraph
+                        PressType.LONG_PRESS -> ButtonCommand.NextSection
+                    }
+                    PhysicalButton.LEFT -> when (event.type) {
+                        PressType.SHORT_PRESS -> ButtonCommand.StartScan
+                        PressType.DOUBLE_PRESS -> ButtonCommand.Rewind(15)
+                        PressType.LONG_PRESS -> ButtonCommand.StartScan
                     }
                 }
             }

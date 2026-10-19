@@ -75,15 +75,29 @@ class AndroidTtsPlaybackController(
             if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                 Log.w(tag, "US English TTS language not supported or missing data")
             } else {
+                val attrs = AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                    .build()
+                tts.setAudioAttributes(attrs)
                 isTtsInitialized = true
                 tts.setSpeechRate(currentSpeed.multiplier)
                 setupUtteranceListener(tts)
-                Log.i(tag, "Android TTS engine initialized successfully")
+                Log.i(tag, "Android TTS engine initialized successfully on STREAM_MUSIC")
             }
         } else {
             Log.w(tag, "TextToSpeech init failed with status: $status")
         }
     }
+
+    fun speakImmediate(text: String) {
+        val tts = textToSpeech ?: return
+        if (!isTtsInitialized) return
+        val params = android.os.Bundle()
+        params.putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "imm_${System.currentTimeMillis()}")
+        tts.speak(text, TextToSpeech.QUEUE_FLUSH, params, "imm")
+    }
+
 
     private fun setupUtteranceListener(tts: TextToSpeech) {
         tts.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
