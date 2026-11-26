@@ -6,3 +6,10 @@ local.properties
 .idea/
 .env
 *.env
+
+# Added Security Safeguards
+.env.*
+*.key
+*.pem
+*service_account*.json
+*credentials*.json
